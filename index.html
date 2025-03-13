@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Together</title>
+    <style>
+        :root {
+            --primary-bg: #0f0f0f;
+            --secondary-bg: #1a1a1a;
+            --text-color: #f5f5f5;
+            --accent-color: #ffffff;
+            --border-color: #2a2a2a;
+            --input-bg: #2a2a2a;
+            --button-hover: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            color: var(--accent-color);
+        }
+
+        .room-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .room-id {
+            padding: 0.5rem 1rem;
+            background-color: var(--secondary-bg);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        button {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+            height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                flex-direction: row;
+            }
+        }
+
+        .video-container {
+            flex: 2;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            height: 100%;
+            min-height: 250px;
+        }
+
+        #player {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            height: 100%;
+            min-height: 300px;
+            max-height: 100%;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .message {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            max-width: 85%;
+            word-break: break-word;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .message-self {
+            background-color: #3a3a3a;
+            align-self: flex-end;
+        }
+
+        .message-other {
+            background-color: #2a2a2a;
+            align-self: flex-start;
+        }
+
+        .message-info {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.2rem;
+            font-size: 0.8rem;
+            color: #aaaaaa;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 1rem;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        input, textarea {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #4d4d4d;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem 0;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .video-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .video-url-input {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .login-box {
+            background-color: var(--secondary-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #aaaaaa;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .create-room-btn {
+            background-color: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .create-room-btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background-color: white;
+            color: black;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #e6e6e6;
+        }
+
+        .online-users {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #4ade80;
+            border-radius: 50%;
+        }
+
+        .username {
+            font-weight: 600;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 767px) {
+            .main-content {
+                height: auto;
+            }
+            
+            .video-container {
+                height: 250px;
+            }
+            
+            .chat-container {
+                height: 350px;
+            }
+            
+            .video-url-input {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .video-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="login-container" id="loginModal">
+        <div class="login-box">
+            <h2>Watch Together</h2>
+            <div class="form-group">
+                <label for="username">Your Name</label>
+                <input type="text" id="username" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label for="roomId">Room ID (Optional)</label>
+                <input type="text" id="roomId" placeholder="Leave empty to create a new room">
+            </div>
+            <div class="form-actions">
+                <button id="joinRoomBtn" class="create-room-btn">Join / Create Room</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">▶</span>
+                <span>Watch Together</span>
+            </div>
+            <div class="room-info">
+                <div class="room-id">
+                    <span>Room: </span>
+                    <span id="roomIdDisplay">---</span>
+                    <button class="copy-btn" id="copyRoomBtn" title="Copy Room ID">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="online-users">
+                    <div class="online-indicator"></div>
+                    <span id="userCount">0</span> online
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="video-url-input">
+                <input type="text" id="videoUrl" placeholder="Enter YouTube URL or Video ID">
+                <button id="loadVideoBtn" class="btn-primary">Load Video</button>
+            </div>
+            <div class="video-controls">
+                <button id="playBtn">Play</button>
+                <button id="pauseBtn">Pause</button>
+                <button id="syncBtn" title="Sync with room">Sync</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="video-container">
+                <div id="player"></div>
+            </div>
+            <div class="chat-container">
+                <div class="chat-header">
+                    <span>Chat</span>
+                    <span id="currentUser"></span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message message-other">
+                        <div class="message-info">System</div>
+                        Welcome to the room! Share the room ID with friends to watch together.
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" placeholder="Type a message...">
+                    <button id="sendMsgBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Scripts -->
+    <script>
+        // Mock server data (in a real app, this would be server-side)
+        const mockData = {
+            rooms: {},
+            generateRoomId: () => {
+                return Math.random().toString(36).substring(2, 8).toUpperCase();
+            },
+            createRoom: (roomId, creatorName) => {
+                if (!mockData.rooms[roomId]) {
+                    mockData.rooms[roomId] = {
+                        id: roomId,
+                        creator: creatorName,
+                        users: {},
+                        videoId: '',
+                        videoState: {
+                            isPlaying: false,
+                            currentTime: 0,
+                            lastUpdate: Date.now()
+                        },
+                        messages: []
+                    };
+                }
+                return mockData.rooms[roomId];
+            },
+            addUserToRoom: (roomId, userId, name) => {
+                if (mockData.rooms[roomId]) {
+                    mockData.rooms[roomId].users[userId] = {
+                        id: userId,
+                        name: name,
+                        joinedAt: Date.now()
+                    };
+                }
+            },
+            removeUserFromRoom: (roomId, userId) => {
+                if (mockData.rooms[roomId] && mockData.rooms[roomId].users[userId]) {
+                    delete mockData.rooms[roomId].users[userId];
+                }
+            },
+            updateVideoState: (roomId, state) => {
+                if (mockData.rooms[roomId]) {
+                    mockData.rooms[roomId].videoState = {
+                        ...state,
+                        lastUpdate: Date.now()
+                    };
+                }
+            },
+            setVideoId: (roomId, videoId) => {
+                if (mockData.rooms[roomId]) {
+                    mockData.rooms[roomId].videoId = videoId;
+                }
+            },
+            addMessage: (roomId, userId, name, message) => {
+                if (mockData.rooms[roomId]) {
+                    const newMessage = {
+                        id: Date.now().toString(),
+                        userId,
+                        name,
+                        message,
+                        timestamp: Date.now()
+                    };
+                    mockData.rooms[roomId].messages.push(newMessage);
+                    return newMessage;
+                }
+                return null;
+            }
+        };
+
+        // Mock WebSocket (in a real app, this would be actual WebSocket)
+        class MockWebSocket {
+            constructor() {
+                this.callbacks = {};
+                this.isConnected = false;
+                this.userId = `user_${Date.now().toString(36)}`;
+                this.currentRoom = null;
+                this.username = null;
+            }
+
+            connect() {
+                setTimeout(() => {
+                    this.isConnected = true;
+                    if (this.callbacks['open']) {
+                        this.callbacks['open']();
+                    }
+                }, 500);
+            }
+
+            on(event, callback) {
+                this.callbacks[event] = callback;
+            }
+
+            emit(event, data) {
+                // Simulate server response
+                setTimeout(() => {
+                    switch (event) {
+                        case 'join-room': {
+                            const { roomId, username } = data;
+                            this.username = username;
+                            let room;
+                            
+                            if (roomId && mockData.rooms[roomId]) {
+                                room = mockData.rooms[roomId];
+                            } else {
+                                const newRoomId = roomId || mockData.generateRoomId();
+                                room = mockData.createRoom(newRoomId, username);
+                            }
+                            
+                            this.currentRoom = room.id;
+                            mockData.addUserToRoom(room.id, this.userId, username);
+                            
+                            // Notify about join
+                            if (this.callbacks['room-joined']) {
+                                this.callbacks['room-joined']({
+                                    room: { 
+                                        id: room.id, 
+                                        videoId: room.videoId,
+                                        videoState: room.videoState,
+                                        userCount: Object.keys(room.users).length 
+                                    },
+                                    user: { id: this.userId, name: username }
+                                });
+                            }
+                            
+                            // Send user count update to all "users"
+                            if (this.callbacks['user-count']) {
+                                this.callbacks['user-count']({
+                                    count: Object.keys(room.users).length
+                                });
+                            }
+                            
+                            // Send existing messages
+                            room.messages.forEach(msg => {
+                                if (this.callbacks['new-message']) {
+                                    this.callbacks['new-message'](msg);
+                                }
+                            });
+                            
+                            // Add system message
+                            const joinMsg = mockData.addMessage(
+                                room.id, 
+                                'system', 
+                                'System', 
+                                `${username} has joined the room`
+                            );
+                            
+                            if (this.callbacks['new-message']) {
+                                this.callbacks['new-message'](joinMsg);
+                            }
+                            break;
+                        }
+                        
+                        case 'send-message': {
+                            if (!this.currentRoom) return;
+                            
+                            const { message } = data;
+                            const newMsg = mockData.addMessage(
+                                this.currentRoom,
+                                this.userId,
+                                this.username,
+                                message
+                            );
+                            
+                            if (this.callbacks['new-message']) {
+                                this.callbacks['new-message'](newMsg);
+                            }
+                            break;
+                        }
+                        
+                        case 'update-video': {
+                            if (!this.currentRoom) return;
+                            
+                            const { videoId } = data;
+                            mockData.setVideoId(this.currentRoom, videoId);
+                            
+                            if (this.callbacks['video-updated']) {
+                                this.callbacks['video-updated']({ videoId });
+                            }
+                            break;
+                        }
+                        
+                        case 'update-player-state': {
+                            if (!this.currentRoom) return;
+           
